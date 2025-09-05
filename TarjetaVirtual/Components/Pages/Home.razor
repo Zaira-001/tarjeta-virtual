@@ -1,0 +1,139 @@
+﻿@page "/"
+@using QriousSharp
+
+<PageTitle>Home</PageTitle>
+
+<link href="CSS/home.css" rel="stylesheet" />
+
+<!-- Partículas flotantes -->
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<div class="card-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-section">
+            <div class="profile-img" id="profileImg">
+                <img src="iconos/logo.png" alt="Consultoría Integral SC" id="logoImg">
+                <div class="online-indicator"></div>
+            </div>
+            <div class="company-name">Consultoría Integral SC</div>
+            <div class="company-tagline">Empresa de Consultoría</div>
+            <div class="company-description">"Consultoría con visión a la cultura de servicio"</div>
+        </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="content">
+        <!-- Servicios -->
+        <div class="services-section">
+            <h3 class="section-title">🏢 Nuestros Servicios</h3>
+            <div class="services-list">
+                <div class="service-item">
+                    <div class="service-icon">📋</div>
+                    <div class="service-text">Trámites Administrativos</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">📊</div>
+                    <div class="service-text">Servicios Fiscales</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">⚖️</div>
+                    <div class="service-text">Servicios Legales</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🧾</div>
+                    <div class="service-text">Facturación 4.0</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">💰</div>
+                    <div class="service-text">Servicios Financieros</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🚀</div>
+                    <div class="service-text">Incubadora de Negocios</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">🏦</div>
+                    <div class="service-text">Financiamiento PYME</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="contact-section">
+            <h3 class="section-title">📞 Contacto Directo</h3>
+            <div class="contact-item" onclick="callPhone()">
+                <div class="contact-icon">📞</div>
+                <div class="contact-info">
+                    <div class="contact-label">Teléfono</div>
+                    <div class="contact-value" id="phoneNumber">+52 565 964 4304</div>
+                </div>
+            </div>
+            <div class="contact-item" onclick="sendEmail()">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-info">
+                    <div class="contact-label">Email</div>
+                    <div class="contact-value" id="emailAddress">lomanconsultoria2025@gmail.com</div>
+                </div>
+            </div>
+           <div class="location-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.6287290276937!2d-99.1690587!3d19.428441100000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff4a8a9c44eb%3A0x5699dae37d869efb!2sC.%20R%C3%ADo%20Lerma%2C%20Cuauht%C3%A9moc%2C%2006500%20Ciudad%20de%20M%C3%A9xico%2C%20CDMX!5e0!3m2!1ses!2smx!4v1757045864547!5m2!1ses!2smx" 
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            </div>
+        </div>
+
+        <!-- Redes Sociales -->
+        <div class="social-section">
+            <h3 class="section-title">🌐 Síguenos</h3>
+            <div class="social-links">
+                <a href="#" class="social-link" onclick="openWhatsApp()">
+                    <img src="iconos/whatsapp.png" alt="Whatsapp" width="45">
+                    </a>
+                <a href="#" class="social-link" onclick="openFacebook()">
+                    <img src="iconos/facebook.png" alt="Facebook" width="45">
+                 </a>
+                <a href="#" class="social-link" onclick="openInstagram()">
+                    <img src="iconos/instagram.png" alt="Instagram" width="45">
+                </a>
+            </div>
+        </div>
+
+        <!-- QR y Botones -->
+        <div class="qr-section">
+            <div class="qr-placeholder" id="qrContainer">
+                <canvas id="qrCode" width="120" height="120"></canvas>
+                <div id="qrContent">
+                    <div style="font-size: 12px; margin-bottom: 5px; color: #666;">🔄</div>
+                    <div style="font-weight: 600; font-size: 12px;">Generando QR...</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 2px;">Un momento por favor</div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="shareWhatsApp()">
+                    📱 Compartir WhatsApp
+                </button>
+                <button class="btn btn-primary" onclick="copyLink()">
+                    🔗 Copiar Enlace
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modalMessage"></p>
+        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px;">Entendido</button>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="JS/home.js"></script>
+
