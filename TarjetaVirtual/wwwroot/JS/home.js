@@ -36,8 +36,6 @@ function callPhone() {
 function sendEmail() {
     const subject = encodeURIComponent(`Contacto desde ${companyName}`);
     const body = encodeURIComponent('Hola, me interesa conocer más sobre sus servicios de consultoría.');
-
-    // Intentar abrir cliente de email nativo
     window.location.href = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
 }
 
@@ -50,104 +48,269 @@ function openWhatsApp() {
 
 // Función para abrir Facebook
 function openFacebook() {
-    // Reemplaza esta URL con tu página real de Facebook
     const facebookUrl = 'https://www.facebook.com/profile.php?id=61578821236039';
     window.open(facebookUrl, '_blank');
 }
 
 // Función para abrir Instagram
 function openInstagram() {
-    // Reemplaza esta URL con tu perfil real de Instagram
     const instagramUrl = 'https://www.instagram.com/lomanconsultoria2025/profilecard/?igsh=aGhrbnN3MGY1bnNh';
     window.open(instagramUrl, '_blank');
 }
 
-// Función para generar código QR que comparte la tarjeta digital completa
+// FUNCIÓN QR ESPECÍFICA PARA TU HTML BLAZOR
 function generateQR() {
-    console.log('🔄 Generando QR automáticamente...');
+    console.log('🚀 === GENERANDO QR PARA BLAZOR ===');
 
-    // El QR contendrá la URL completa de la tarjeta digital
-    // Esto asegura que quien escanee vea toda la tarjeta con su diseño completo
-    const fullCardUrl = window.location.href;
-
-    try {
-        // Generar QR con la URL completa
-        const qr = new QRious({
-            element: document.getElementById('qrCode'),
-            value: fullCardUrl,
-            size: 120,
-            background: 'white',
-            foreground: '#333',
-            level: 'M', // Nivel medio es suficiente para URLs
-            padding: 10
-        });
-
-        // Cambiar el contenido después de generar
-        setTimeout(() => {
-            const qrContent = document.getElementById('qrContent');
-            if (qrContent) {
-                qrContent.innerHTML = `
-                    <div style="font-size: 9px; color: #666; margin-top: 5px; line-height: 1.3; text-align: center;">
-                    </div>`;
-            }
-        }, 100);
-
-        console.log('✅ QR generado exitosamente');
-
-    } catch (error) {
-        console.error('❌ Error generando QR:', error);
-        // Fallback con API externa
-        generateQRWithAPI();
-    }
-}
-
-// Función de respaldo usando API externa (AGREGAR ESTA FUNCIÓN)
-function generateQRWithAPI() {
-    console.log('🔄 Generando QR con API externa...');
-
-    const qrElement = document.getElementById('qrCode');
-    const qrContent = document.getElementById('qrContent');
     const currentUrl = window.location.href;
+    console.log('🔗 URL para QR:', currentUrl);
 
-    if (qrElement && qrContent) {
-        // Ocultar canvas
-        qrElement.style.display = 'none';
+    // Buscar los elementos específicos de tu HTML
+    const qrContainer = document.getElementById('qrContainer');
+    const qrCanvas = document.getElementById('qrCode');
+    const qrContent = document.getElementById('qrContent');
 
-        // Crear imagen con API
-        const img = document.createElement('img');
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(currentUrl)}`;
-        img.style.cssText = 'width: 120px; height: 120px;';
-        img.alt = 'Código QR - Tarjeta Digital';
+    console.log('🎯 Elementos encontrados:');
+    console.log('- qrContainer:', !!qrContainer);
+    console.log('- qrCanvas:', !!qrCanvas);
+    console.log('- qrContent:', !!qrContent);
 
-        img.onload = function () {
-            // Insertar imagen antes del contenido
-            qrElement.parentNode.insertBefore(img, qrContent);
+    if (!qrContainer) {
+        console.error('❌ No se encontró qrContainer');
+        return;
+    }
 
-            // Actualizar contenido
+    // ESTRATEGIA: Reemplazar el canvas con una imagen
+    const qrSize = 120;
+
+    // Actualizar contenido de loading
+    if (qrContent) {
+        qrContent.innerHTML = `
+            <div style="font-size: 12px; margin-bottom: 8px; color: #666;">⏳</div>
+            <div style="font-weight: 600; font-size: 12px; color: #333;">Generando QR...</div>
+            <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">Conectando con servidor</div>
+        `;
+    }
+
+    // Ocultar canvas original
+    if (qrCanvas) {
+        qrCanvas.style.display = 'none';
+    }
+
+    // Lista de APIs de QR para probar
+    const qrAPIs = [
+        {
+            name: 'QR Server',
+            url: `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(currentUrl)}&format=png&ecc=M&margin=1&bgcolor=ffffff&color=333333&qzone=2`
+        },
+        {
+            name: 'QuickChart',
+            url: `https://quickchart.io/qr?text=${encodeURIComponent(currentUrl)}&size=${qrSize}&format=png&light=ffffff&dark=333333`
+        },
+        {
+            name: 'Google Charts',
+            url: `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodeURIComponent(currentUrl)}&choe=UTF-8&chld=M|1`
+        }
+    ];
+
+    let qrImageElement = null;
+
+    function tryQRAPI(apiIndex = 0) {
+        if (apiIndex >= qrAPIs.length) {
+            console.error('❌ Todas las APIs de QR fallaron');
+            showQRFallback();
+            return;
+        }
+
+        const api = qrAPIs[apiIndex];
+        console.log(`🔄 Probando API ${apiIndex + 1}/${qrAPIs.length}: ${api.name}`);
+
+        // Crear nueva imagen
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        // Actualizar loading con progreso
+        if (qrContent) {
             qrContent.innerHTML = `
-                <div style="font-size: 9px; color: #666; margin-top: 5px; line-height: 1.3; text-align: center;">
+                <div style="font-size: 12px; margin-bottom: 8px; color: #4CAF50;">🔄</div>
+                <div style="font-weight: 600; font-size: 12px; color: #333;">Generando QR...</div>
+                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">
+                    Probando servidor ${apiIndex + 1}/${qrAPIs.length}
                 </div>
             `;
+        }
 
-            console.log('✅ QR generado con API externa');
+        img.onload = function () {
+            console.log(`✅ QR generado exitosamente con ${api.name}`);
+
+            // Remover imagen anterior si existe
+            if (qrImageElement && qrImageElement.parentNode) {
+                qrImageElement.remove();
+            }
+
+            // Configurar nueva imagen
+            img.style.cssText = `
+                width: ${qrSize}px; 
+                height: ${qrSize}px; 
+                border-radius: 5px;
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+                border: 1px solid #e1e8ed;
+                display: block;
+                position: relative;
+                top: 10px;
+                margin: 0 auto 15px auto;
+                align-items: center;
+            `;
+
+            img.alt = 'Código QR - Tarjeta Digital';
+            img.id = 'qrImage';
+
+            // Insertar imagen en el contenedor (antes del qrContent)
+            if (qrContent) {
+                qrContainer.insertBefore(img, qrContent);
+            } else {
+                qrContainer.appendChild(img);
+            }
+
+            qrImageElement = img;
+
+            // Actualizar contenido informativo
+            if (qrContent) {
+                qrContent.innerHTML = `
+                    <div style="
+                        font-size: 0px; 
+                        color: black;  
+                        text-align: center; 
+                    ">
+                     
+                    </div>
+                `;
+            }
+
+            console.log('✅ QR insertado correctamente en el DOM');
         };
 
         img.onerror = function () {
+            console.log(`❌ Falló API: ${api.name}, probando siguiente...`);
+
+            // Actualizar loading con error
+            if (qrContent) {
+                qrContent.innerHTML = `
+                    <div style="font-size: 12px; margin-bottom: 8px; color: #ff9800;">⚠️</div>
+                    <div style="font-weight: 600; font-size: 12px; color: #333;">Reintentando...</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">
+                        Servidor ${apiIndex + 1} no disponible
+                    </div>
+                `;
+            }
+
+            // Probar siguiente API después de un breve delay
+            setTimeout(() => {
+                tryQRAPI(apiIndex + 1);
+            }, 1000);
+        };
+
+        // Timeout para APIs lentas (8 segundos)
+        const timeoutId = setTimeout(() => {
+            if (!img.complete) {
+                console.log(`⏰ Timeout en API: ${api.name}`);
+                img.src = ''; // Cancelar carga
+                tryQRAPI(apiIndex + 1);
+            }
+        }, 8000);
+
+        // Limpiar timeout si la imagen carga
+        img.addEventListener('load', () => clearTimeout(timeoutId));
+        img.addEventListener('error', () => clearTimeout(timeoutId));
+
+        // Iniciar carga
+        img.src = api.url;
+    }
+
+    function showQRFallback() {
+        console.log('🎯 Mostrando fallback QR');
+
+        // Remover imagen anterior si existe
+        if (qrImageElement && qrImageElement.parentNode) {
+            qrImageElement.remove();
+        }
+
+        // Crear botón de fallback atractivo
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.id = 'qrFallback';
+        fallbackDiv.style.cssText = `
+            width: ${qrSize}px; 
+            height: ${qrSize}px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+            border-radius: 12px; 
+            color: white; 
+            text-align: center; 
+            font-size: 11px; 
+            padding: 15px; 
+            box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            cursor: pointer;
+            margin: 0 auto 15px auto;
+            transition: transform 0.2s ease;
+        `;
+
+        fallbackDiv.innerHTML = `
+            <div>
+                <div style="font-size: 32px; margin-bottom: 8px;">📱</div>
+                <div style="font-weight: bold; margin-bottom: 6px; font-size: 12px;">¡Compartir Tarjeta!</div>
+                <div style="font-size: 10px; opacity: 0.9; margin-bottom: 8px;">Toca para copiar enlace</div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 6px; padding: 6px 10px; font-size: 10px; font-weight: 600;">
+                    📋 COPIAR ENLACE
+                </div>
+            </div>
+        `;
+
+        // Agregar evento click
+        fallbackDiv.onclick = function () {
+            copyLink();
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        };
+
+        // Insertar en el contenedor
+        if (qrContent) {
+            qrContainer.insertBefore(fallbackDiv, qrContent);
+        } else {
+            qrContainer.appendChild(fallbackDiv);
+        }
+
+        // Actualizar contenido informativo
+        if (qrContent) {
             qrContent.innerHTML = `
-                <div style="font-size: 12px; color: #ff6b6b; text-align: center; padding: 10px;">
-                    ⚠️<br>
-                    <strong>Error</strong><br>
-                    <span style="font-size: 10px;">No se pudo generar el QR</span><br>
-                    <button onclick="generateQR()" style="margin-top: 8px; padding: 4px 8px; font-size: 10px; border: 1px solid #ff6b6b; background: white; color: #ff6b6b; border-radius: 4px; cursor: pointer;">
-                        Reintentar
-                    </button>
+                <div style="
+                    font-size: 11px; 
+                    color: #4CAF50; 
+                    margin-top: 12px; 
+                    text-align: center; 
+                    line-height: 1.4;
+                    font-weight: 500;
+                ">
+                    🚀 <strong>¡Toca el botón verde!</strong><br>
+                    <span style="color: #666; font-size: 10px;">para copiar el enlace de tu tarjeta</span>
                 </div>
             `;
-        };
+        }
+
+        console.log('✅ Fallback QR mostrado correctamente');
     }
+
+    // Iniciar el proceso
+    setTimeout(() => {
+        tryQRAPI();
+    }, 500);
 }
 
-// Función mejorada para compartir en WhatsApp (incluye la URL de la tarjeta)
+// Función para compartir en WhatsApp
 function shareWhatsApp() {
     const currentUrl = window.location.href;
     const shareText = encodeURIComponent(`🏢 *${companyName}*
@@ -175,7 +338,7 @@ ${currentUrl}
     window.open(whatsappUrl, '_blank');
 }
 
-// Función para copiar enlace con mensaje mejorado
+// Función para copiar enlace
 function copyLink() {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -190,7 +353,7 @@ Ahora puedes pegarlo en:
 
 Quien abra el enlace verá tu tarjeta completa con diseño interactivo.`);
     }).catch(() => {
-        // Fallback para navegadores que no soportan clipboard API
+        // Fallback para navegadores antiguos
         const textArea = document.createElement('textarea');
         textArea.value = currentUrl;
         document.body.appendChild(textArea);
@@ -209,64 +372,7 @@ Copia este enlace para compartir tu tarjeta completa con diseño interactivo.`);
     });
 }
 
-// Función adicional para obtener información completa para compartir
-function getFullCardInfo() {
-    return {
-        url: window.location.href,
-        company: companyName,
-        phone: phoneNumber,
-        email: emailAddress,
-        address: address,
-        description: "Consultoría con visión a la cultura de servicio",
-        services: [
-            "Trámites Administrativos",
-            "Servicios Fiscales",
-            "Servicios Legales",
-            "Facturación 4.0",
-            "Servicios Financieros",
-            "Incubadora de Negocios",
-            "Financiamiento PYME"
-        ]
-    };
-}
-
-// Función para verificar si la tarjeta se está viendo correctamente
-function validateCardDisplay() {
-    // Verificar que todos los elementos importantes estén visibles
-    const requiredElements = [
-        '.company-name',
-        '.services-section',
-        '.contact-section',
-        '.social-section'
-    ];
-
-    const allElementsPresent = requiredElements.every(selector =>
-        document.querySelector(selector) !== null
-    );
-
-    if (allElementsPresent) {
-        console.log('✅ Tarjeta digital cargada correctamente - Lista para compartir');
-        return true;
-    } else {
-        console.log('⚠️ Algunos elementos de la tarjeta no están cargados correctamente');
-        return false;
-    }
-}
-
-// Función para generar enlace de vista previa
-function generatePreviewLink() {
-    const baseUrl = window.location.href;
-    const previewParams = new URLSearchParams({
-        preview: 'true',
-        company: companyName,
-        phone: phoneNumber,
-        email: emailAddress
-    });
-
-    return `${baseUrl}?${previewParams.toString()}`;
-}
-
-// Cerrar modal al hacer clic fuera de él
+// Cerrar modal al hacer clic fuera
 window.onclick = function (event) {
     const modal = document.getElementById('messageModal');
     if (event.target == modal) {
@@ -274,7 +380,7 @@ window.onclick = function (event) {
     }
 }
 
-// Efecto de partículas adicional
+// Efecto de partículas flotantes
 function createFloatingParticle() {
     const particle = document.createElement('div');
     particle.style.position = 'fixed';
@@ -298,48 +404,149 @@ function createFloatingParticle() {
     }, 5000);
 }
 
-// Crear partículas flotantes cada cierto tiempo
-setInterval(createFloatingParticle, 3000);
-
-// EJECUTAR AUTOMÁTICAMENTE AL CARGAR LA PÁGINA
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('📱 Inicializando tarjeta digital...');
-    console.log('🌐 URL actual:', window.location.href);
-
-    setTimeout(() => {
-        validateCardDisplay();
-
-        // Verificar si QRious está disponible antes de generar
-        if (typeof QRious !== 'undefined') {
-            generateQR();
-        } else {
-            console.log('⚠️ QRious no disponible inmediatamente, esperando...');
-            setTimeout(() => {
-                if (typeof QRious !== 'undefined') {
-                    generateQR();
-                } else {
-                    console.log('⚠️ QRious no se cargó, usando fallback');
-                    generateQRWithAPI();
-                }
-            }, 1000);
-        }
-    }, 500);
-
-    // Agregar efectos hover a los elementos de servicio
+// Función para reiniciar animaciones automáticamente
+function restartServiceAnimations() {
     const serviceItems = document.querySelectorAll('.service-item');
+    const serviceIcons = document.querySelectorAll('.service-icon');
+
     serviceItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            item.style.transform = 'translateY(-3px) scale(1.02)';
-        });
-        item.addEventListener('mouseleave', () => {
-            item.style.transform = 'translateY(0) scale(1)';
+        // Reiniciar animación de la tarjeta
+        item.style.animation = 'none';
+        void item.offsetWidth; // Forzar reflow
+        item.style.animation = 'slideInUp 0.8s ease-out, servicePulse 6s ease-in-out infinite 2s';
+    });
+
+    serviceIcons.forEach(icon => {
+        // Reiniciar animación del icono
+        icon.style.animation = 'none';
+        void icon.offsetWidth; // Forzar reflow
+        icon.style.animation = 'iconAutoRotate 8s ease-in-out infinite';
+    });
+}
+
+// Función para debug de animaciones
+function debugAnimations() {
+    console.log('🎭 === ESTADO DE ANIMACIONES ===');
+    const serviceItems = document.querySelectorAll('.service-item');
+    const serviceIcons = document.querySelectorAll('.service-icon');
+
+    serviceItems.forEach((item, index) => {
+        console.log(`Servicio ${index + 1}:`, {
+            animation: item.style.animation,
+            playState: item.style.animationPlayState
         });
     });
+
+    serviceIcons.forEach((icon, index) => {
+        console.log(`Icono ${index + 1}:`, {
+            animation: icon.style.animation,
+            playState: icon.style.animationPlayState
+        });
+    });
+}
+
+// Función para debug del QR
+function debugQRStatus() {
+    console.log('🔍 === ESTADO ACTUAL DEL QR ===');
+    console.log('qrContainer:', document.getElementById('qrContainer'));
+    console.log('qrCanvas:', document.getElementById('qrCode'));
+    console.log('qrContent:', document.getElementById('qrContent'));
+    console.log('qrImage:', document.getElementById('qrImage'));
+    console.log('qrFallback:', document.getElementById('qrFallback'));
+    console.log('URL actual:', window.location.href);
+}
+
+// EVENTOS PRINCIPALES - INICIALIZACIÓN COMPLETA
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('📱 Inicializando tarjeta digital Blazor...');
+    console.log('🌐 URL actual:', window.location.href);
+
+    // Inicializar partículas
+    setInterval(createFloatingParticle, 3000);
+
+    // Inicializar QR después de que Blazor termine de renderizar
+    setTimeout(() => {
+        console.log('🚀 Iniciando generación de QR...');
+        generateQR();
+    }, 1000);
+
+    // Configurar efectos hover para servicios con animaciones automáticas
+    setTimeout(() => {
+        const serviceItems = document.querySelectorAll('.service-item');
+        serviceItems.forEach((item, index) => {
+            // Pausar animaciones automáticas al hacer hover
+            item.addEventListener('mouseenter', () => {
+                item.style.animationPlayState = 'paused';
+                const icon = item.querySelector('.service-icon');
+                if (icon) {
+                    icon.style.animationPlayState = 'paused';
+                }
+            });
+
+            // Reanudar animaciones automáticas al quitar el hover
+            item.addEventListener('mouseleave', () => {
+                item.style.animationPlayState = 'running';
+                const icon = item.querySelector('.service-icon');
+                if (icon) {
+                    icon.style.animationPlayState = 'running';
+                }
+            });
+        });
+    }, 500);
+
+    // Configurar observer para animaciones cuando entran en vista
+    const observerOptions = {
+        threshold: 0.3,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const serviceObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Activar animaciones cuando el elemento es visible
+                const item = entry.target;
+                const icon = item.querySelector('.service-icon');
+
+                item.style.animationPlayState = 'running';
+                if (icon) {
+                    icon.style.animationPlayState = 'running';
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observar todos los elementos de servicio
+    setTimeout(() => {
+        const serviceItems = document.querySelectorAll('.service-item');
+        serviceItems.forEach(item => {
+            serviceObserver.observe(item);
+        });
+    }, 1000);
+
+    // Reiniciar animaciones cada 25 segundos para mantenerlas fluidas
+    setInterval(function () {
+        const serviceIcons = document.querySelectorAll('.service-icon');
+
+        // Solo reiniciar si no hay hover activo
+        serviceIcons.forEach((icon, index) => {
+            const item = icon.closest('.service-item');
+            if (item && !item.matches(':hover')) {
+                setTimeout(() => {
+                    const animation = icon.style.animation;
+                    icon.style.animation = 'none';
+                    void icon.offsetWidth;
+                    icon.style.animation = animation || 'iconAutoRotate 8s ease-in-out infinite';
+                }, index * 200); // Delay escalonado para efecto de onda
+            }
+        });
+    }, 25000);
 });
 
-// Verificación adicional al cargar completamente la ventana
+// Verificación final al cargar la ventana completamente
 window.addEventListener('load', () => {
-    // Animación de carga con delay escalonado
+    console.log('🏁 Ventana cargada completamente');
+
+    // Animaciones de entrada con delays escalonados
     const elements = document.querySelectorAll('.service-item, .contact-item');
     elements.forEach((el, index) => {
         setTimeout(() => {
@@ -348,18 +555,25 @@ window.addEventListener('load', () => {
         }, index * 100);
     });
 
-    // Verificar si el QR se generó correctamente
+    // Verificación final del QR
     setTimeout(() => {
-        const canvas = document.getElementById('qrCode');
-        if (canvas && (!canvas.style.display || canvas.style.display !== 'none')) {
-            const context = canvas.getContext('2d');
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const isEmpty = imageData.data.every(pixel => pixel === 0);
+        const qrImage = document.getElementById('qrImage');
+        const qrFallback = document.getElementById('qrFallback');
 
-            if (isEmpty) {
-                console.log('🔄 Canvas vacío, regenerando QR...');
-                generateQR();
-            }
+        if (!qrImage && !qrFallback) {
+            console.log('🔄 QR no detectado después de la carga, reintentando...');
+            generateQR();
+        } else {
+            console.log('✅ QR verificado correctamente');
         }
-    }, 500);
+    }, 3000);
+
+    // Iniciar ciclo de reinicio de animaciones cada 30 segundos
+    setInterval(restartServiceAnimations, 30000);
 });
+
+// Hacer funciones disponibles globalmente para debug
+window.debugAnimations = debugAnimations;
+window.restartServiceAnimations = restartServiceAnimations;
+window.debugQRStatus = debugQRStatus;
+window.regenerateQR = generateQR;
