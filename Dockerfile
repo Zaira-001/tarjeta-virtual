@@ -1,11 +1,14 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
-COPY . ./
-RUN dotnet publish TarjetaVirtual/TarjetaVirtual.csproj -c Release -o out
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY TarjetaVirtual/TarjetaVirtual.csproj TarjetaVirtual/
+RUN dotnet restore "TarjetaVirtual/TarjetaVirtual.csproj"
+COPY . .
+WORKDIR "/src/TarjetaVirtual"
+RUN dotnet publish "TarjetaVirtual.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=build /app/out .
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+COPY --from=build /app/publish .
+EXPOSE $PORT
+ENV ASPNETCORE_URLS=http://0.0.0.0:$PORT
 ENTRYPOINT ["dotnet", "TarjetaVirtual.dll"]
