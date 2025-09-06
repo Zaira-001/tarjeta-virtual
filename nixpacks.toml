@@ -1,0 +1,12 @@
+[providers]
+# Use .NET provider
+dotnet = true
+
+[phases.build]
+cmds = ['dotnet publish TarjetaVirtual/TarjetaVirtual.csproj -c Release -o out']
+
+[phases.start]
+cmd = 'dotnet out/TarjetaVirtual.dll'
+
+[variables]
+ASPNETCORE_URLS = 'http://0.0.0.0:$PORT'
