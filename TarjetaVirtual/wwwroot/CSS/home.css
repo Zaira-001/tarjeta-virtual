@@ -212,23 +212,11 @@ body {
     background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff6b6b);
     padding: 4px;
     cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    animation: logoFloat 4s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-    0%, 100% {
-        transform: translateY(0px) rotateY(0deg);
-    }
-
-    50% {
-        transform: translateY(-10px) rotateY(180deg);
-    }
 }
 
 .profile-img:hover {
-    transform: scale(1.15) rotateY(360deg);
+    transform: scale(1.15);
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
 }
 
