@@ -1,29 +1,189 @@
-﻿// Variables globales
+﻿// ================================
+// VARIABLES GLOBALES
+// ================================
 const phoneNumber = "5659644304";
-const emailAddress = "lomanconsultoria2025@gmail.com";
+const emailAddress = "consultoriaempresarialsadecv@gmail.com";
 const whatsappNumber = "5659644304";
 const companyName = "Consultoría Integral SC";
 const address = "Ciudad de México, CDMX";
 const websiteUrl = window.location.href;
 
-// Función para mostrar modal
+// ================================
+// BASE DE DATOS DE SERVICIOS
+// ================================
+const servicesData = {
+    tramites: {
+        icon: "📋",
+        title: "Trámites Administrativos",
+        description: "Facilitamos todos tus trámites administrativos con eficiencia y profesionalismo. Ahorra tiempo y evita complicaciones.",
+        features: [
+            { icon: "🏢", text: "Constitución de empresas (incluye: Acta constitutiva, Registro público, RFC, e.firma y sello)" },
+            { icon: "📝", text: "Creación de personas morales en modalidad S.A.S." },
+            { icon: "🛡️", text: "Registro de marca ante el IMPI" },
+            { icon: "📋", text: "REPSE (Registro de Empresas Prestadoras de Servicios Especializados)" },
+            { icon: "⚖️", text: "Elaboración de contratos civiles" },
+            { icon: "🏭", text: "Implementación de Normas ISO y Certificaciones Internacionales" },
+            { icon: "🌐", text: "Gestión aduanal completa e inscripción en Padrón de Importadores" }
+        ]
+    },
+    fiscales: {
+        icon: "📊",
+        title: "Servicios Fiscales",
+        description: "Mantén tu empresa en regla con el SAT. Ofrecemos soluciones fiscales integrales para optimizar tu carga tributaria.",
+        features: [
+            { icon: "💼", text: "Declaraciones mensuales y anuales" },
+            { icon: "📈", text: "Planeación fiscal efectiva e inteligente" },
+            { icon: "💰", text: "Estrategias fiscales para reducción de carga tributaria" },
+            { icon: "👥", text: "Elaboración y timbrado de nómina" },
+            { icon: "🔍", text: "Regularización de situación ante el SAT" },
+            { icon: "⚖️", text: "Atención de requerimientos del SAT y corrección de errores" },
+            { icon: "🌍", text: "Optimización de aranceles y tratados internacionales" }
+        ]
+    },
+    legales: {
+        icon: "⚖️",
+        title: "Servicios Legales",
+        description: "Protege tus intereses con asesoría legal especializada. Te acompañamos en todos tus asuntos jurídicos empresariales.",
+        features: [
+            { icon: "📜", text: "Elaboración de contratos civiles y de arrendamiento" },
+            { icon: "🛡️", text: "Protección legal mediante registro de marcas" },
+            { icon: "⚖️", text: "Asesoría legal integral" },
+            { icon: "🏭", text: "Implementación de Normas Oficiales Mexicanas (NOM)" },
+            { icon: "🔐", text: "Consultoría en gestión de riesgos" },
+            { icon: "🤝", text: "Acompañamiento legal, fiscal y financiero" }
+        ]
+    },
+    facturacion: {
+        icon: "🧾",
+        title: "Facturación y Contabilidad",
+        description: "Servicios contables integrales y facturación electrónica para cumplir con todas tus obligaciones sin complicaciones.",
+        features: [
+            { icon: "💻", text: "Elaboración y timbrado de nómina" },
+            { icon: "📊", text: "Servicios contables integrales" },
+            { icon: "📈", text: "Elaboración de estados financieros" },
+            { icon: "🔍", text: "Auditoría y análisis de situación real de la empresa" },
+            { icon: "📋", text: "Registro y organización de operaciones económicas" },
+            { icon: "✅", text: "Cumplimiento de obligaciones contables sin complicaciones" }
+        ]
+    },
+    financieros: {
+        icon: "💰",
+        title: "Servicios Financieros",
+        description: "Optimiza tus recursos financieros con nuestra asesoría especializada. Tomamos decisiones estratégicas basadas en datos.",
+        features: [
+            { icon: "📊", text: "Estados financieros y análisis de situación financiera" },
+            { icon: "💹", text: "Asesorías para toma de decisiones de financiamiento" },
+            { icon: "📉", text: "Estrategias para reducción de costos de producción" },
+            { icon: "💵", text: "Asesorías para fijación de precios en productos y servicios" },
+            { icon: "📈", text: "KPI's (Indicadores Clave de Rendimiento)" },
+            { icon: "🎯", text: "Control de inventarios y reducción de mermas" },
+            { icon: "💼", text: "Modelo financiero para proyectos y cálculo de margen de ganancia" }
+        ]
+    },
+    incubadora: {
+        icon: "🚀",
+        title: "Incubadora de Negocios",
+        description: "Transforma tu idea en un negocio exitoso. Te acompañamos desde la conceptualización hasta el lanzamiento y crecimiento.",
+        features: [
+            { icon: "💡", text: "Acompañamiento paso a paso desde la idea hasta la validación" },
+            { icon: "📋", text: "Elaboración de planes de negocio completos (Resumen ejecutivo, Estudio de mercado, Estrategia de marketing, Plan financiero)" },
+            { icon: "🎯", text: "Validación real de tu idea en el mercado" },
+            { icon: "🚀", text: "Apoyo para crear tu primer MVP (Producto Mínimo Viable)" },
+            { icon: "🤝", text: "Mentorías personalizadas y soporte continuo" },
+            { icon: "🏢", text: "Asesoría en constitución de sociedades (S.A. DE C.V., S.A.P.I, S. DE R.L. DE C.V.)" },
+            { icon: "📊", text: "Diagnóstico completo del negocio y estrategia personalizada" }
+        ]
+    },
+    pyme: {
+        icon: "🏦",
+        title: "Financiamiento PYME",
+        description: "Despacho especializado para PYMES y MIPYMES con paquetes accesibles desde $2,400 mensuales (IVA incluido).",
+        features: [
+            { icon: "💰", text: "Estrategias fiscales para reducción de carga" },
+            { icon: "📈", text: "Asesorías para toma de decisiones de financiamiento" },
+            { icon: "📉", text: "Estrategias para reducción de costos de producción" },
+            { icon: "🚀", text: "Consultoría para crecimiento empresarial" },
+            { icon: "💼", text: "Planeación fiscal efectiva para ahorro" },
+            { icon: "💵", text: "Paquetes desde $2,400 mensuales (IVA incluido)" }
+        ]
+    }
+};
+
+// ================================
+// FUNCIONES DE MODALES
+// ================================
 function showModal(message) {
     document.getElementById('modalMessage').textContent = message;
     document.getElementById('messageModal').style.display = 'block';
 }
 
-// Función para cerrar modal
 function closeModal() {
     document.getElementById('messageModal').style.display = 'none';
 }
 
-// Función para llamar por teléfono
+function closeServiceModal() {
+    document.getElementById('serviceModal').style.display = 'none';
+}
+
+function showServiceDetails(serviceId) {
+    console.log('🔍 Mostrando servicio:', serviceId);
+    const service = servicesData[serviceId];
+
+    if (!service) {
+        console.error('❌ Servicio no encontrado:', serviceId);
+        return;
+    }
+
+    const featuresHTML = service.features.map(feature => `
+        <div class="service-feature-item">
+            <div class="service-feature-icon">${feature.icon}</div>
+            <div class="service-feature-text">${feature.text}</div>
+        </div>
+    `).join('');
+
+    const modalContent = `
+        <div class="service-modal-header">
+            <div class="service-modal-icon">${service.icon}</div>
+            <div>
+                <div class="service-modal-title">${service.title}</div>
+            </div>
+        </div>
+        <div class="service-modal-description">
+            ${service.description}
+        </div>
+        <div class="service-modal-features">
+            <h4>✨ ¿Qué incluye?</h4>
+            ${featuresHTML}
+        </div>
+        <div class="service-modal-cta">
+            <button class="btn btn-secondary" onclick="contactForService('${service.title}')">
+                📱 Consultar
+            </button>
+            <button class="btn btn-primary" onclick="closeServiceModal()">
+                ✓ Cerrar
+            </button>
+        </div>
+    `;
+
+    document.getElementById('serviceModalContent').innerHTML = modalContent;
+    document.getElementById('serviceModal').style.display = 'block';
+    console.log('✅ Modal de servicio mostrado');
+}
+
+function contactForService(serviceName) {
+    const message = encodeURIComponent(`¡Hola! Me interesa conocer más sobre el servicio de *${serviceName}* de ${companyName}. ¿Podrían proporcionarme más información?`);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    closeServiceModal();
+}
+
+// ================================
+// FUNCIONES DE CONTACTO
+// ================================
 function callPhone() {
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        // Dispositivo móvil - abrir marcador
         window.location.href = `tel:${phoneNumber}`;
     } else {
-        // Escritorio - copiar número
         navigator.clipboard.writeText(phoneNumber).then(() => {
             showModal(`📞 Número copiado: ${phoneNumber}`);
         }).catch(() => {
@@ -32,58 +192,48 @@ function callPhone() {
     }
 }
 
-// Función para enviar email
 function sendEmail() {
     const subject = encodeURIComponent(`Contacto desde ${companyName}`);
     const body = encodeURIComponent('Hola, me interesa conocer más sobre sus servicios de consultoría.');
     window.location.href = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
 }
 
-// Función para abrir WhatsApp
 function openWhatsApp() {
     const message = encodeURIComponent(`¡Hola! Me interesa conocer más sobre los servicios de ${companyName}. Vi su tarjeta digital y me gustaría obtener información sobre sus servicios de consultoría.`);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
 }
 
-// Función para abrir Facebook
 function openFacebook() {
     const facebookUrl = 'https://www.facebook.com/profile.php?id=61578821236039';
     window.open(facebookUrl, '_blank');
 }
 
-// Función para abrir Instagram
 function openInstagram() {
     const instagramUrl = 'https://www.instagram.com/lomanconsultoria2025/profilecard/?igsh=aGhrbnN3MGY1bnNh';
     window.open(instagramUrl, '_blank');
 }
 
-// FUNCIÓN QR ESPECÍFICA PARA TU HTML BLAZOR
+// ================================
+// FUNCIÓN GENERACIÓN QR
+// ================================
 function generateQR() {
     console.log('🚀 === GENERANDO QR PARA BLAZOR ===');
 
     const currentUrl = window.location.href;
     console.log('🔗 URL para QR:', currentUrl);
 
-    // Buscar los elementos específicos de tu HTML
     const qrContainer = document.getElementById('qrContainer');
     const qrCanvas = document.getElementById('qrCode');
     const qrContent = document.getElementById('qrContent');
-
-    console.log('🎯 Elementos encontrados:');
-    console.log('- qrContainer:', !!qrContainer);
-    console.log('- qrCanvas:', !!qrCanvas);
-    console.log('- qrContent:', !!qrContent);
 
     if (!qrContainer) {
         console.error('❌ No se encontró qrContainer');
         return;
     }
 
-    // ESTRATEGIA: Reemplazar el canvas con una imagen
     const qrSize = 120;
 
-    // Actualizar contenido de loading
     if (qrContent) {
         qrContent.innerHTML = `
             <div style="font-size: 12px; margin-bottom: 8px; color: #666;">⏳</div>
@@ -92,12 +242,10 @@ function generateQR() {
         `;
     }
 
-    // Ocultar canvas original
     if (qrCanvas) {
         qrCanvas.style.display = 'none';
     }
 
-    // Lista de APIs de QR para probar
     const qrAPIs = [
         {
             name: 'QR Server',
@@ -125,11 +273,9 @@ function generateQR() {
         const api = qrAPIs[apiIndex];
         console.log(`🔄 Probando API ${apiIndex + 1}/${qrAPIs.length}: ${api.name}`);
 
-        // Crear nueva imagen
         const img = new Image();
         img.crossOrigin = 'anonymous';
 
-        // Actualizar loading con progreso
         if (qrContent) {
             qrContent.innerHTML = `
                 <div style="font-size: 12px; margin-bottom: 8px; color: #4CAF50;">🔄</div>
@@ -143,12 +289,10 @@ function generateQR() {
         img.onload = function () {
             console.log(`✅ QR generado exitosamente con ${api.name}`);
 
-            // Remover imagen anterior si existe
             if (qrImageElement && qrImageElement.parentNode) {
                 qrImageElement.remove();
             }
 
-            // Configurar nueva imagen
             img.style.cssText = `
                 width: ${qrSize}px; 
                 height: ${qrSize}px; 
@@ -159,13 +303,11 @@ function generateQR() {
                 position: relative;
                 top: 10px;
                 margin: 0 auto 15px auto;
-                align-items: center;
             `;
 
             img.alt = 'Código QR - Tarjeta Digital';
             img.id = 'qrImage';
 
-            // Insertar imagen en el contenedor (antes del qrContent)
             if (qrContent) {
                 qrContainer.insertBefore(img, qrContent);
             } else {
@@ -174,26 +316,18 @@ function generateQR() {
 
             qrImageElement = img;
 
-            // Actualizar contenido informativo
             if (qrContent) {
                 qrContent.innerHTML = `
-                    <div style="
-                        font-size: 0px; 
-                        color: black;  
-                        text-align: center; 
-                    ">
-                     
-                    </div>
+                    <div style="font-size: 0px; color: black;"></div>
                 `;
             }
 
-            console.log('✅ QR insertado correctamente en el DOM');
+            console.log('✅ QR insertado correctamente');
         };
 
         img.onerror = function () {
-            console.log(`❌ Falló API: ${api.name}, probando siguiente...`);
+            console.log(`❌ Falló API: ${api.name}`);
 
-            // Actualizar loading con error
             if (qrContent) {
                 qrContent.innerHTML = `
                     <div style="font-size: 12px; margin-bottom: 8px; color: #ff9800;">⚠️</div>
@@ -204,38 +338,30 @@ function generateQR() {
                 `;
             }
 
-            // Probar siguiente API después de un breve delay
-            setTimeout(() => {
-                tryQRAPI(apiIndex + 1);
-            }, 1000);
+            setTimeout(() => tryQRAPI(apiIndex + 1), 1000);
         };
 
-        // Timeout para APIs lentas (8 segundos)
         const timeoutId = setTimeout(() => {
             if (!img.complete) {
                 console.log(`⏰ Timeout en API: ${api.name}`);
-                img.src = ''; // Cancelar carga
+                img.src = '';
                 tryQRAPI(apiIndex + 1);
             }
         }, 8000);
 
-        // Limpiar timeout si la imagen carga
         img.addEventListener('load', () => clearTimeout(timeoutId));
         img.addEventListener('error', () => clearTimeout(timeoutId));
 
-        // Iniciar carga
         img.src = api.url;
     }
 
     function showQRFallback() {
         console.log('🎯 Mostrando fallback QR');
 
-        // Remover imagen anterior si existe
         if (qrImageElement && qrImageElement.parentNode) {
             qrImageElement.remove();
         }
 
-        // Crear botón de fallback atractivo
         const fallbackDiv = document.createElement('div');
         fallbackDiv.id = 'qrFallback';
         fallbackDiv.style.cssText = `
@@ -268,7 +394,6 @@ function generateQR() {
             </div>
         `;
 
-        // Agregar evento click
         fallbackDiv.onclick = function () {
             copyLink();
             this.style.transform = 'scale(0.95)';
@@ -277,40 +402,30 @@ function generateQR() {
             }, 150);
         };
 
-        // Insertar en el contenedor
         if (qrContent) {
             qrContainer.insertBefore(fallbackDiv, qrContent);
         } else {
             qrContainer.appendChild(fallbackDiv);
         }
 
-        // Actualizar contenido informativo
         if (qrContent) {
             qrContent.innerHTML = `
-                <div style="
-                    font-size: 11px; 
-                    color: #4CAF50; 
-                    margin-top: 12px; 
-                    text-align: center; 
-                    line-height: 1.4;
-                    font-weight: 500;
-                ">
+                <div style="font-size: 11px; color: #4CAF50; margin-top: 12px; text-align: center; line-height: 1.4; font-weight: 500;">
                     🚀 <strong>¡Toca el botón verde!</strong><br>
                     <span style="color: #666; font-size: 10px;">para copiar el enlace de tu tarjeta</span>
                 </div>
             `;
         }
 
-        console.log('✅ Fallback QR mostrado correctamente');
+        console.log('✅ Fallback QR mostrado');
     }
 
-    // Iniciar el proceso
-    setTimeout(() => {
-        tryQRAPI();
-    }, 500);
+    setTimeout(() => tryQRAPI(), 500);
 }
 
-// Función para compartir en WhatsApp
+// ================================
+// FUNCIONES DE COMPARTIR
+// ================================
 function shareWhatsApp() {
     const currentUrl = window.location.href;
     const shareText = encodeURIComponent(`🏢 *${companyName}*
@@ -338,7 +453,6 @@ ${currentUrl}
     window.open(whatsappUrl, '_blank');
 }
 
-// Función para copiar enlace
 function copyLink() {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -353,7 +467,6 @@ Ahora puedes pegarlo en:
 
 Quien abra el enlace verá tu tarjeta completa con diseño interactivo.`);
     }).catch(() => {
-        // Fallback para navegadores antiguos
         const textArea = document.createElement('textarea');
         textArea.value = currentUrl;
         document.body.appendChild(textArea);
@@ -362,25 +475,15 @@ Quien abra el enlace verá tu tarjeta completa con diseño interactivo.`);
             document.execCommand('copy');
             showModal('🔗 ¡Enlace de la tarjeta digital copiado al portapapeles!');
         } catch (err) {
-            showModal(`🔗 Enlace de tu tarjeta digital:
-            
-${currentUrl}
-
-Copia este enlace para compartir tu tarjeta completa con diseño interactivo.`);
+            showModal(`🔗 Enlace de tu tarjeta digital:\n\n${currentUrl}\n\nCopia este enlace para compartir tu tarjeta completa con diseño interactivo.`);
         }
         document.body.removeChild(textArea);
     });
 }
 
-// Cerrar modal al hacer clic fuera
-window.onclick = function (event) {
-    const modal = document.getElementById('messageModal');
-    if (event.target == modal) {
-        closeModal();
-    }
-}
-
-// Efecto de partículas flotantes
+// ================================
+// EFECTOS Y ANIMACIONES
+// ================================
 function createFloatingParticle() {
     const particle = document.createElement('div');
     particle.style.position = 'fixed';
@@ -404,77 +507,60 @@ function createFloatingParticle() {
     }, 5000);
 }
 
-// Función para reiniciar animaciones automáticamente
 function restartServiceAnimations() {
     const serviceItems = document.querySelectorAll('.service-item');
     const serviceIcons = document.querySelectorAll('.service-icon');
 
     serviceItems.forEach(item => {
-        // Reiniciar animación de la tarjeta
         item.style.animation = 'none';
-        void item.offsetWidth; // Forzar reflow
+        void item.offsetWidth;
         item.style.animation = 'slideInUp 0.8s ease-out, servicePulse 6s ease-in-out infinite 2s';
     });
 
     serviceIcons.forEach(icon => {
-        // Reiniciar animación del icono
         icon.style.animation = 'none';
-        void icon.offsetWidth; // Forzar reflow
+        void icon.offsetWidth;
         icon.style.animation = 'iconAutoRotate 8s ease-in-out infinite';
     });
 }
 
-// Función para debug de animaciones
-function debugAnimations() {
-    console.log('🎭 === ESTADO DE ANIMACIONES ===');
-    const serviceItems = document.querySelectorAll('.service-item');
-    const serviceIcons = document.querySelectorAll('.service-icon');
+// ================================
+// EVENT LISTENERS
+// ================================
+window.onclick = function (event) {
+    const messageModal = document.getElementById('messageModal');
+    const serviceModal = document.getElementById('serviceModal');
 
-    serviceItems.forEach((item, index) => {
-        console.log(`Servicio ${index + 1}:`, {
-            animation: item.style.animation,
-            playState: item.style.animationPlayState
-        });
-    });
-
-    serviceIcons.forEach((icon, index) => {
-        console.log(`Icono ${index + 1}:`, {
-            animation: icon.style.animation,
-            playState: icon.style.animationPlayState
-        });
-    });
+    if (event.target == messageModal) {
+        closeModal();
+    }
+    if (event.target == serviceModal) {
+        closeServiceModal();
+    }
 }
 
-// Función para debug del QR
-function debugQRStatus() {
-    console.log('🔍 === ESTADO ACTUAL DEL QR ===');
-    console.log('qrContainer:', document.getElementById('qrContainer'));
-    console.log('qrCanvas:', document.getElementById('qrCode'));
-    console.log('qrContent:', document.getElementById('qrContent'));
-    console.log('qrImage:', document.getElementById('qrImage'));
-    console.log('qrFallback:', document.getElementById('qrFallback'));
-    console.log('URL actual:', window.location.href);
-}
-
-// EVENTOS PRINCIPALES - INICIALIZACIÓN COMPLETA
 document.addEventListener('DOMContentLoaded', function () {
     console.log('📱 Inicializando tarjeta digital Blazor...');
     console.log('🌐 URL actual:', window.location.href);
 
+    // Verificar que showServiceDetails está disponible
+    console.log('✅ Función showServiceDetails disponible:', typeof showServiceDetails === 'function');
+
     // Inicializar partículas
     setInterval(createFloatingParticle, 3000);
 
-    // Inicializar QR después de que Blazor termine de renderizar
+    // Inicializar QR
     setTimeout(() => {
         console.log('🚀 Iniciando generación de QR...');
         generateQR();
     }, 1000);
 
-    // Configurar efectos hover para servicios con animaciones automáticas
+    // Configurar efectos hover
     setTimeout(() => {
         const serviceItems = document.querySelectorAll('.service-item');
+        console.log('🎯 Servicios encontrados:', serviceItems.length);
+
         serviceItems.forEach((item, index) => {
-            // Pausar animaciones automáticas al hacer hover
             item.addEventListener('mouseenter', () => {
                 item.style.animationPlayState = 'paused';
                 const icon = item.querySelector('.service-icon');
@@ -483,7 +569,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // Reanudar animaciones automáticas al quitar el hover
             item.addEventListener('mouseleave', () => {
                 item.style.animationPlayState = 'running';
                 const icon = item.querySelector('.service-icon');
@@ -494,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, 500);
 
-    // Configurar observer para animaciones cuando entran en vista
+    // Configurar observer
     const observerOptions = {
         threshold: 0.3,
         rootMargin: '0px 0px -50px 0px'
@@ -503,10 +588,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const serviceObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Activar animaciones cuando el elemento es visible
                 const item = entry.target;
                 const icon = item.querySelector('.service-icon');
-
                 item.style.animationPlayState = 'running';
                 if (icon) {
                     icon.style.animationPlayState = 'running';
@@ -515,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, observerOptions);
 
-    // Observar todos los elementos de servicio
     setTimeout(() => {
         const serviceItems = document.querySelectorAll('.service-item');
         serviceItems.forEach(item => {
@@ -523,11 +605,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, 1000);
 
-    // Reiniciar animaciones cada 25 segundos para mantenerlas fluidas
+    // Reiniciar animaciones periódicamente
     setInterval(function () {
         const serviceIcons = document.querySelectorAll('.service-icon');
-
-        // Solo reiniciar si no hay hover activo
         serviceIcons.forEach((icon, index) => {
             const item = icon.closest('.service-item');
             if (item && !item.matches(':hover')) {
@@ -536,17 +616,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     icon.style.animation = 'none';
                     void icon.offsetWidth;
                     icon.style.animation = animation || 'iconAutoRotate 8s ease-in-out infinite';
-                }, index * 200); // Delay escalonado para efecto de onda
+                }, index * 200);
             }
         });
     }, 25000);
 });
 
-// Verificación final al cargar la ventana completamente
 window.addEventListener('load', () => {
     console.log('🏁 Ventana cargada completamente');
 
-    // Animaciones de entrada con delays escalonados
     const elements = document.querySelectorAll('.service-item, .contact-item');
     elements.forEach((el, index) => {
         setTimeout(() => {
@@ -555,25 +633,24 @@ window.addEventListener('load', () => {
         }, index * 100);
     });
 
-    // Verificación final del QR
     setTimeout(() => {
         const qrImage = document.getElementById('qrImage');
         const qrFallback = document.getElementById('qrFallback');
 
         if (!qrImage && !qrFallback) {
-            console.log('🔄 QR no detectado después de la carga, reintentando...');
+            console.log('🔄 QR no detectado, reintentando...');
             generateQR();
         } else {
             console.log('✅ QR verificado correctamente');
         }
     }, 3000);
 
-    // Iniciar ciclo de reinicio de animaciones cada 30 segundos
     setInterval(restartServiceAnimations, 30000);
 });
 
-// Hacer funciones disponibles globalmente para debug
-window.debugAnimations = debugAnimations;
-window.restartServiceAnimations = restartServiceAnimations;
-window.debugQRStatus = debugQRStatus;
+// Hacer funciones disponibles globalmente
+window.showServiceDetails = showServiceDetails;
+window.contactForService = contactForService;
 window.regenerateQR = generateQR;
+
+console.log('✅ Script home.js cargado completamente');

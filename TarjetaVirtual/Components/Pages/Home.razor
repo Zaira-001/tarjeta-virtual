@@ -33,31 +33,31 @@
         <div class="services-section">
             <h3 class="section-title">🏢 Nuestros Servicios</h3>
             <div class="services-list">
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('tramites')">
                     <div class="service-icon">📋</div>
                     <div class="service-text">Trámites Administrativos</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('fiscales')">
                     <div class="service-icon">📊</div>
                     <div class="service-text">Servicios Fiscales</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('legales')">
                     <div class="service-icon">⚖️</div>
                     <div class="service-text">Servicios Legales</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('facturacion')">
                     <div class="service-icon">🧾</div>
                     <div class="service-text">Facturación 4.0</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('financieros')">
                     <div class="service-icon">💰</div>
                     <div class="service-text">Servicios Financieros</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('incubadora')">
                     <div class="service-icon">🚀</div>
                     <div class="service-text">Incubadora de Negocios</div>
                 </div>
-                <div class="service-item">
+                <div class="service-item" onclick="showServiceDetails('pyme')">
                     <div class="service-icon">🏦</div>
                     <div class="service-text">Financiamiento PYME</div>
                 </div>
@@ -78,7 +78,7 @@
                 <div class="contact-icon">✉️</div>
                 <div class="contact-info">
                     <div class="contact-label">Email</div>
-                    <div class="contact-value" id="emailAddress">lomanconsultoria2025@gmail.com</div>
+                    <div class="contact-value" id="emailAddress">consultoriaempresarialsadecv@gmail.com</div>
                 </div>
             </div>
            <div class="location-map">
@@ -132,6 +132,14 @@
         <span class="close" onclick="closeModal()">&times;</span>
         <p id="modalMessage"></p>
         <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px;">Entendido</button>
+    </div>
+</div>
+
+<!-- Modal de Servicios -->
+<div id="serviceModal" class="modal">
+    <div class="modal-content service-modal-content">
+        <span class="close" onclick="closeServiceModal()">&times;</span>
+        <div id="serviceModalContent"></div>
     </div>
 </div>
 
