@@ -8,11 +8,6 @@ const companyName = "Consultoría Integral SC";
 const address = "Ciudad de México, CDMX";
 const websiteUrl = window.location.href;
 
-// Variables de control para evitar ejecuciones duplicadas
-let qrGenerationInProgress = false;
-let particleInterval = null;
-let animationRestartInterval = null;
-
 // ================================
 // BASE DE DATOS DE SERVICIOS
 // ================================
@@ -131,10 +126,11 @@ function closeServiceModal() {
 }
 
 function showServiceDetails(serviceId) {
+    console.log('🔍 Mostrando servicio:', serviceId);
     const service = servicesData[serviceId];
 
     if (!service) {
-        console.error('Servicio no encontrado:', serviceId);
+        console.error('❌ Servicio no encontrado:', serviceId);
         return;
     }
 
@@ -171,6 +167,7 @@ function showServiceDetails(serviceId) {
 
     document.getElementById('serviceModalContent').innerHTML = modalContent;
     document.getElementById('serviceModal').style.display = 'block';
+    console.log('✅ Modal de servicio mostrado');
 }
 
 function contactForService(serviceName) {
@@ -218,23 +215,20 @@ function openInstagram() {
 }
 
 // ================================
-// FUNCIÓN GENERACIÓN QR (OPTIMIZADA)
+// FUNCIÓN GENERACIÓN QR
 // ================================
 function generateQR() {
-    // Prevenir ejecuciones múltiples
-    if (qrGenerationInProgress) {
-        console.log('QR ya en proceso de generación');
-        return;
-    }
+    console.log('🚀 === GENERANDO QR PARA BLAZOR ===');
 
-    qrGenerationInProgress = true;
     const currentUrl = window.location.href;
+    console.log('🔗 URL para QR:', currentUrl);
+
     const qrContainer = document.getElementById('qrContainer');
     const qrCanvas = document.getElementById('qrCode');
     const qrContent = document.getElementById('qrContent');
 
     if (!qrContainer) {
-        qrGenerationInProgress = false;
+        console.error('❌ No se encontró qrContainer');
         return;
     }
 
@@ -244,6 +238,7 @@ function generateQR() {
         qrContent.innerHTML = `
             <div style="font-size: 12px; margin-bottom: 8px; color: #666;">⏳</div>
             <div style="font-weight: 600; font-size: 12px; color: #333;">Generando QR...</div>
+            <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">Conectando con servidor</div>
         `;
     }
 
@@ -251,85 +246,181 @@ function generateQR() {
         qrCanvas.style.display = 'none';
     }
 
-    // Solo usar una API confiable
-    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(currentUrl)}&format=png&ecc=M&margin=1`;
+    const qrAPIs = [
+        {
+            name: 'QR Server',
+            url: `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(currentUrl)}&format=png&ecc=M&margin=1&bgcolor=ffffff&color=333333&qzone=2`
+        },
+        {
+            name: 'QuickChart',
+            url: `https://quickchart.io/qr?text=${encodeURIComponent(currentUrl)}&size=${qrSize}&format=png&light=ffffff&dark=333333`
+        },
+        {
+            name: 'Google Charts',
+            url: `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodeURIComponent(currentUrl)}&choe=UTF-8&chld=M|1`
+        }
+    ];
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
+    let qrImageElement = null;
 
-    img.onload = function () {
-        const existingQR = document.getElementById('qrImage');
-        if (existingQR) existingQR.remove();
-
-        img.style.cssText = `
-            width: ${qrSize}px; 
-            height: ${qrSize}px; 
-            border-radius: 5px;
-            display: block;
-            margin: 0 auto 15px auto;
-        `;
-
-        img.alt = 'Código QR';
-        img.id = 'qrImage';
-
-        if (qrContent) {
-            qrContainer.insertBefore(img, qrContent);
-            qrContent.innerHTML = '';
-        } else {
-            qrContainer.appendChild(img);
+    function tryQRAPI(apiIndex = 0) {
+        if (apiIndex >= qrAPIs.length) {
+            console.error('❌ Todas las APIs de QR fallaron');
+            showQRFallback();
+            return;
         }
 
-        qrGenerationInProgress = false;
-    };
+        const api = qrAPIs[apiIndex];
+        console.log(`🔄 Probando API ${apiIndex + 1}/${qrAPIs.length}: ${api.name}`);
 
-    img.onerror = function () {
-        showQRFallback();
-        qrGenerationInProgress = false;
-    };
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
 
-    img.src = qrAPI;
-}
+        if (qrContent) {
+            qrContent.innerHTML = `
+                <div style="font-size: 12px; margin-bottom: 8px; color: #4CAF50;">🔄</div>
+                <div style="font-weight: 600; font-size: 12px; color: #333;">Generando QR...</div>
+                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">
+                    Probando servidor ${apiIndex + 1}/${qrAPIs.length}
+                </div>
+            `;
+        }
 
-function showQRFallback() {
-    const qrContainer = document.getElementById('qrContainer');
-    const existingQR = document.getElementById('qrImage');
-    if (existingQR) existingQR.remove();
+        img.onload = function () {
+            console.log(`✅ QR generado exitosamente con ${api.name}`);
 
-    const fallbackDiv = document.createElement('div');
-    fallbackDiv.id = 'qrFallback';
-    fallbackDiv.style.cssText = `
-        width: 120px; 
-        height: 120px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        background: #4CAF50; 
-        border-radius: 12px; 
-        color: white; 
-        text-align: center; 
-        font-size: 11px; 
-        padding: 15px; 
-        cursor: pointer;
-        margin: 0 auto 15px auto;
-    `;
+            if (qrImageElement && qrImageElement.parentNode) {
+                qrImageElement.remove();
+            }
 
-    fallbackDiv.innerHTML = `
-        <div>
-            <div style="font-size: 32px; margin-bottom: 8px;">📱</div>
-            <div style="font-weight: bold; margin-bottom: 6px;">¡Compartir!</div>
-            <div style="font-size: 10px;">Toca para copiar</div>
-        </div>
-    `;
+            img.style.cssText = `
+                width: ${qrSize}px; 
+                height: ${qrSize}px; 
+                border-radius: 5px;
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+                border: 1px solid #e1e8ed;
+                display: block;
+                position: relative;
+                top: 10px;
+                margin: 0 auto 15px auto;
+            `;
 
-    fallbackDiv.onclick = copyLink;
+            img.alt = 'Código QR - Tarjeta Digital';
+            img.id = 'qrImage';
 
-    const qrContent = document.getElementById('qrContent');
-    if (qrContent) {
-        qrContainer.insertBefore(fallbackDiv, qrContent);
-        qrContent.innerHTML = '';
-    } else {
-        qrContainer.appendChild(fallbackDiv);
+            if (qrContent) {
+                qrContainer.insertBefore(img, qrContent);
+            } else {
+                qrContainer.appendChild(img);
+            }
+
+            qrImageElement = img;
+
+            if (qrContent) {
+                qrContent.innerHTML = `
+                    <div style="font-size: 0px; color: black;"></div>
+                `;
+            }
+
+            console.log('✅ QR insertado correctamente');
+        };
+
+        img.onerror = function () {
+            console.log(`❌ Falló API: ${api.name}`);
+
+            if (qrContent) {
+                qrContent.innerHTML = `
+                    <div style="font-size: 12px; margin-bottom: 8px; color: #ff9800;">⚠️</div>
+                    <div style="font-weight: 600; font-size: 12px; color: #333;">Reintentando...</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; color: #888;">
+                        Servidor ${apiIndex + 1} no disponible
+                    </div>
+                `;
+            }
+
+            setTimeout(() => tryQRAPI(apiIndex + 1), 1000);
+        };
+
+        const timeoutId = setTimeout(() => {
+            if (!img.complete) {
+                console.log(`⏰ Timeout en API: ${api.name}`);
+                img.src = '';
+                tryQRAPI(apiIndex + 1);
+            }
+        }, 8000);
+
+        img.addEventListener('load', () => clearTimeout(timeoutId));
+        img.addEventListener('error', () => clearTimeout(timeoutId));
+
+        img.src = api.url;
     }
+
+    function showQRFallback() {
+        console.log('🎯 Mostrando fallback QR');
+
+        if (qrImageElement && qrImageElement.parentNode) {
+            qrImageElement.remove();
+        }
+
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.id = 'qrFallback';
+        fallbackDiv.style.cssText = `
+            width: ${qrSize}px; 
+            height: ${qrSize}px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+            border-radius: 12px; 
+            color: white; 
+            text-align: center; 
+            font-size: 11px; 
+            padding: 15px; 
+            box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            cursor: pointer;
+            margin: 0 auto 15px auto;
+            transition: transform 0.2s ease;
+        `;
+
+        fallbackDiv.innerHTML = `
+            <div>
+                <div style="font-size: 32px; margin-bottom: 8px;">📱</div>
+                <div style="font-weight: bold; margin-bottom: 6px; font-size: 12px;">¡Compartir Tarjeta!</div>
+                <div style="font-size: 10px; opacity: 0.9; margin-bottom: 8px;">Toca para copiar enlace</div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 6px; padding: 6px 10px; font-size: 10px; font-weight: 600;">
+                    📋 COPIAR ENLACE
+                </div>
+            </div>
+        `;
+
+        fallbackDiv.onclick = function () {
+            copyLink();
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        };
+
+        if (qrContent) {
+            qrContainer.insertBefore(fallbackDiv, qrContent);
+        } else {
+            qrContainer.appendChild(fallbackDiv);
+        }
+
+        if (qrContent) {
+            qrContent.innerHTML = `
+                <div style="font-size: 11px; color: #4CAF50; margin-top: 12px; text-align: center; line-height: 1.4; font-weight: 500;">
+                    🚀 <strong>¡Toca el botón verde!</strong><br>
+                    <span style="color: #666; font-size: 10px;">para copiar el enlace de tu tarjeta</span>
+                </div>
+            `;
+        }
+
+        console.log('✅ Fallback QR mostrado');
+    }
+
+    setTimeout(() => tryQRAPI(), 500);
 }
 
 // ================================
@@ -340,13 +431,23 @@ function shareWhatsApp() {
     const shareText = encodeURIComponent(`🏢 *${companyName}*
 "Consultoría con visión a la cultura de servicio"
 
-👆 *¡Mira mi tarjeta digital!*
+👆 *¡Mira mi tarjeta digital interactiva!*
 ${currentUrl}
 
 📞 ${phoneNumber}
 ✉️ ${emailAddress}
+📍 ${address}
 
-¡Visita mi tarjeta digital para más información!`);
+🏢 *Nuestros Servicios:*
+• Trámites Administrativos
+• Servicios Fiscales  
+• Servicios Legales
+• Facturación 4.0
+• Servicios Financieros
+• Incubadora de Negocios
+• Financiamiento PYME
+
+¡Visita mi tarjeta digital para más información y contacto directo!`);
 
     const whatsappUrl = `https://wa.me/?text=${shareText}`;
     window.open(whatsappUrl, '_blank');
@@ -355,74 +456,201 @@ ${currentUrl}
 function copyLink() {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
-        showModal('🔗 ¡Enlace copiado al portapapeles!');
+        showModal(`🔗 ¡Perfecto! El enlace de tu tarjeta digital ha sido copiado.
+
+Ahora puedes pegarlo en:
+• Mensajes de WhatsApp
+• Correos electrónicos  
+• Redes sociales
+• Firmas digitales
+• Cualquier lugar donde quieras compartir tu información profesional
+
+Quien abra el enlace verá tu tarjeta completa con diseño interactivo.`);
     }).catch(() => {
-        showModal(`🔗 Enlace: ${currentUrl}`);
+        const textArea = document.createElement('textarea');
+        textArea.value = currentUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showModal('🔗 ¡Enlace de la tarjeta digital copiado al portapapeles!');
+        } catch (err) {
+            showModal(`🔗 Enlace de tu tarjeta digital:\n\n${currentUrl}\n\nCopia este enlace para compartir tu tarjeta completa con diseño interactivo.`);
+        }
+        document.body.removeChild(textArea);
     });
 }
 
 // ================================
-// EFECTOS OPTIMIZADOS
+// EFECTOS Y ANIMACIONES
 // ================================
 function createFloatingParticle() {
-    // Limitar cantidad de partículas
-    const existingParticles = document.querySelectorAll('[data-particle]');
-    if (existingParticles.length > 3) return;
-
     const particle = document.createElement('div');
-    particle.setAttribute('data-particle', 'true');
-    particle.style.cssText = `
-        position: fixed;
-        width: 3px;
-        height: 3px;
-        background: rgba(255,255,255,0.3);
-        border-radius: 50%;
-        pointer-events: none;
-        left: ${Math.random() * 100}%;
-        top: 100%;
-        animation: floatUp ${Math.random() * 2 + 2}s linear forwards;
-        z-index: 1;
-    `;
+    particle.style.position = 'fixed';
+    particle.style.width = Math.random() * 4 + 2 + 'px';
+    particle.style.height = particle.style.width;
+    particle.style.background = `hsl(${Math.random() * 360}, 50%, 70%)`;
+    particle.style.borderRadius = '50%';
+    particle.style.pointerEvents = 'none';
+    particle.style.opacity = Math.random() * 0.5 + 0.2;
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = '100%';
+    particle.style.animation = `floatUp ${Math.random() * 3 + 2}s linear forwards`;
+    particle.style.zIndex = '1';
 
     document.body.appendChild(particle);
 
-    setTimeout(() => particle.remove(), 4000);
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.remove();
+        }
+    }, 5000);
+}
+
+function restartServiceAnimations() {
+    const serviceItems = document.querySelectorAll('.service-item');
+    const serviceIcons = document.querySelectorAll('.service-icon');
+
+    serviceItems.forEach(item => {
+        item.style.animation = 'none';
+        void item.offsetWidth;
+        item.style.animation = 'slideInUp 0.8s ease-out, servicePulse 6s ease-in-out infinite 2s';
+    });
+
+    serviceIcons.forEach(icon => {
+        icon.style.animation = 'none';
+        void icon.offsetWidth;
+        icon.style.animation = 'iconAutoRotate 8s ease-in-out infinite';
+    });
 }
 
 // ================================
-// INICIALIZACIÓN
+// EVENT LISTENERS
 // ================================
 window.onclick = function (event) {
     const messageModal = document.getElementById('messageModal');
     const serviceModal = document.getElementById('serviceModal');
 
-    if (event.target == messageModal) closeModal();
-    if (event.target == serviceModal) closeServiceModal();
+    if (event.target == messageModal) {
+        closeModal();
+    }
+    if (event.target == serviceModal) {
+        closeServiceModal();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Generar QR una sola vez
-    setTimeout(generateQR, 1000);
+    console.log('📱 Inicializando tarjeta digital Blazor...');
+    console.log('🌐 URL actual:', window.location.href);
 
-    // Iniciar partículas con menos frecuencia
-    if (!particleInterval) {
-        particleInterval = setInterval(createFloatingParticle, 5000);
-    }
+    // Verificar que showServiceDetails está disponible
+    console.log('✅ Función showServiceDetails disponible:', typeof showServiceDetails === 'function');
 
-    // Configurar servicios con event delegation (más eficiente)
-    const servicesList = document.querySelector('.services-list');
-    if (servicesList) {
-        servicesList.addEventListener('click', function (e) {
-            const serviceItem = e.target.closest('.service-item');
-            if (serviceItem) {
-                const serviceId = serviceItem.getAttribute('onclick').match(/'([^']+)'/)[1];
-                showServiceDetails(serviceId);
+    // Inicializar partículas
+    setInterval(createFloatingParticle, 3000);
+
+    // Inicializar QR
+    setTimeout(() => {
+        console.log('🚀 Iniciando generación de QR...');
+        generateQR();
+    }, 1000);
+
+    // Configurar efectos hover
+    setTimeout(() => {
+        const serviceItems = document.querySelectorAll('.service-item');
+        console.log('🎯 Servicios encontrados:', serviceItems.length);
+
+        serviceItems.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                item.style.animationPlayState = 'paused';
+                const icon = item.querySelector('.service-icon');
+                if (icon) {
+                    icon.style.animationPlayState = 'paused';
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.animationPlayState = 'running';
+                const icon = item.querySelector('.service-icon');
+                if (icon) {
+                    icon.style.animationPlayState = 'running';
+                }
+            });
+        });
+    }, 500);
+
+    // Configurar observer
+    const observerOptions = {
+        threshold: 0.3,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const serviceObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const item = entry.target;
+                const icon = item.querySelector('.service-icon');
+                item.style.animationPlayState = 'running';
+                if (icon) {
+                    icon.style.animationPlayState = 'running';
+                }
             }
         });
-    }
+    }, observerOptions);
+
+    setTimeout(() => {
+        const serviceItems = document.querySelectorAll('.service-item');
+        serviceItems.forEach(item => {
+            serviceObserver.observe(item);
+        });
+    }, 1000);
+
+    // Reiniciar animaciones periódicamente
+    setInterval(function () {
+        const serviceIcons = document.querySelectorAll('.service-icon');
+        serviceIcons.forEach((icon, index) => {
+            const item = icon.closest('.service-item');
+            if (item && !item.matches(':hover')) {
+                setTimeout(() => {
+                    const animation = icon.style.animation;
+                    icon.style.animation = 'none';
+                    void icon.offsetWidth;
+                    icon.style.animation = animation || 'iconAutoRotate 8s ease-in-out infinite';
+                }, index * 200);
+            }
+        });
+    }, 25000);
 });
 
-// Funciones globales
+window.addEventListener('load', () => {
+    console.log('🏁 Ventana cargada completamente');
+
+    const elements = document.querySelectorAll('.service-item, .contact-item');
+    elements.forEach((el, index) => {
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0) rotateX(0deg)';
+        }, index * 100);
+    });
+
+    setTimeout(() => {
+        const qrImage = document.getElementById('qrImage');
+        const qrFallback = document.getElementById('qrFallback');
+
+        if (!qrImage && !qrFallback) {
+            console.log('🔄 QR no detectado, reintentando...');
+            generateQR();
+        } else {
+            console.log('✅ QR verificado correctamente');
+        }
+    }, 3000);
+
+    setInterval(restartServiceAnimations, 30000);
+});
+
+// Hacer funciones disponibles globalmente
 window.showServiceDetails = showServiceDetails;
 window.contactForService = contactForService;
 window.regenerateQR = generateQR;
+
+console.log('✅ Script home.js cargado completamente');
