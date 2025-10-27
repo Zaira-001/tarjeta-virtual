@@ -28,6 +28,16 @@ namespace TarjetaVirtual
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Method == "HEAD")
+                {
+                    context.Response.StatusCode = 200;
+                    return;
+                }
+                await next();
+            });
+
             app.Run();
         }
     }
